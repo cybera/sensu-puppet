@@ -49,7 +49,7 @@ Puppet::Type.type(:sensu_check).provide(:json) do
   end
 
   def check_args
-    ['handlers','command','interval','occurrences','refresh','subscribers','type','standalone','high_flap_threshold','low_flap_threshold','timeout','aggregate','handle','publish','dependencies','custom']
+    ['handlers','command','interval','occurrences','refresh','subscribers','type','standalone','high_flap_threshold','low_flap_threshold','timeout','aggregate','handle','publish','dependencies','custom','ttl']
   end
 
   def custom
@@ -255,5 +255,13 @@ Puppet::Type.type(:sensu_check).provide(:json) do
     else
       conf['checks'][resource[:name]]['standalone'] = value
     end
+  end
+
+  def ttl
+    conf['checks'][resource[:name]]['ttl'].to_s
+  end
+
+  def ttl=(value)
+    conf['checks'][resource[:name]]['ttl'] = value.to_i
   end
 end

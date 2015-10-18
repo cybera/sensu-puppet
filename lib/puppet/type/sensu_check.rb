@@ -141,6 +141,10 @@ Puppet::Type.newtype(:sensu_check) do
     newvalues(:true, :false)
   end
 
+  newproperty(:ttl) do
+    desc "Check ttl in seconds"
+  end
+
   autorequire(:package) do
     ['sensu']
   end
