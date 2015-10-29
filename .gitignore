@@ -6,3 +6,7 @@ Gemfile.lock
 .yardoc
 doc/**
 .bundle
+*.swp
+coverage/
+junit/
+log/

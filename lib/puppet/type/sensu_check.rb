@@ -74,6 +74,10 @@ Puppet::Type.newtype(:sensu_check) do
     desc "A host is determined to be flapping when the percent change is below this threshold."
   end
 
+  newproperty(:source) do
+    desc "The check source, used to create a JIT Sensu client for an external resource (e.g. a network switch)."
+  end
+
   newproperty(:subscribers, :array_matching => :all) do
     desc "Who is subscribed to this check"
     def insync?(is)
@@ -130,6 +134,14 @@ Puppet::Type.newtype(:sensu_check) do
 
   newproperty(:publish, :parent => PuppetX::Sensu::BooleanProperty) do
     desc "Whether check is unpublished"
+  end
+
+  newproperty(:subdue) do
+    desc "Check subdue"
+  end
+
+  newproperty(:ttl) do
+    desc "Check ttl in seconds"
   end
 
   autorequire(:package) do

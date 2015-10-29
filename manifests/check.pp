@@ -34,6 +34,10 @@
 # [*refresh*]
 #   Integer.  The number of seconds sensu-plugin-aware handlers should wait before taking second action.
 #
+# [*source*]
+#   String.  The check source, used to create a JIT Sensu client for an external resource (e.g. a network switch).
+#   Default: undef
+#
 # [*subscribers*]
 #   Array of Strings.  Which subscriptions must execute this check
 #   Default: []
@@ -68,6 +72,14 @@
 #   Array.  List of checks this check depends on.  Note: The validity of the other checks is not enforced by puppet
 #   Default: undef
 #
+# [*ttl*]
+#   Integer. The time to live (TTL) in seconds until check results are considered stale.
+#   Default: undef
+#
+# [*subdue*]
+#   Hash.  Check subdue configuration
+#   Default: undef
+#
 define sensu::check(
   $command,
   $ensure              = 'present',
@@ -77,6 +89,7 @@ define sensu::check(
   $interval            = 60,
   $occurrences         = undef,
   $refresh             = undef,
+  $source              = undef,
   $subscribers         = undef,
   $low_flap_threshold  = undef,
   $high_flap_threshold = undef,
@@ -86,6 +99,8 @@ define sensu::check(
   $publish             = undef,
   $dependencies        = undef,
   $custom              = undef,
+  $ttl                 = undef,
+  $subdue              = undef,
 ) {
 
   validate_re($ensure, ['^present$', '^absent$'] )
@@ -108,6 +123,9 @@ define sensu::check(
   if $timeout and !is_numeric($timeout) {
     fail("sensu::check{${name}}: timeout must be a numeric (got: ${timeout})")
   }
+  if $ttl and !is_integer($ttl) {
+    fail("sensu::check{${name}}: ttl must be an integer (got: ${ttl})")
+  }
 
   $check_name = regsubst(regsubst($name, ' ', '_', 'G'), '[\(\)]', '', 'G')
 
@@ -128,6 +146,7 @@ define sensu::check(
     interval            => $interval,
     occurrences         => $occurrences,
     refresh             => $refresh,
+    source              => $source,
     subscribers         => $subscribers,
     low_flap_threshold  => $low_flap_threshold,
     high_flap_threshold => $high_flap_threshold,
@@ -137,8 +156,10 @@ define sensu::check(
     publish             => $publish,
     dependencies        => $dependencies,
     custom              => $custom,
+    subdue              => $subdue,
     require             => File['/etc/sensu/conf.d/checks'],
     notify              => $::sensu::check_notify,
+    ttl                 => $ttl,
   }
 
 }

@@ -8,13 +8,13 @@ class sensu::rabbitmq::config {
     fail("Use of private class ${name} by ${caller_module_name}")
   }
 
-  if $sensu::purge_config and !$sensu::server and !$sensu::client {
+  if $sensu::_purge_config and !$sensu::server and !$sensu::client {
     $ensure = 'absent'
   } else {
     $ensure = 'present'
   }
 
-  if $sensu::rabbitmq_ssl_cert_chain {
+  if $sensu::rabbitmq_ssl_cert_chain or $sensu::rabbitmq_ssl_private_key {
     file { '/etc/sensu/ssl':
       ensure  => directory,
       owner   => 'sensu',
@@ -27,7 +27,7 @@ class sensu::rabbitmq::config {
     # the URI provided
     if $sensu::rabbitmq_ssl_cert_chain and $sensu::rabbitmq_ssl_cert_chain =~ /^puppet:\/\// {
       file { '/etc/sensu/ssl/cert.pem':
-        ensure  => present,
+        ensure  => file,
         source  => $sensu::rabbitmq_ssl_cert_chain,
         owner   => 'sensu',
         group   => 'sensu',
@@ -41,7 +41,7 @@ class sensu::rabbitmq::config {
     # create the file with conents of the variable
     } elsif $sensu::rabbitmq_ssl_cert_chain and  $sensu::rabbitmq_ssl_cert_chain =~ /BEGIN CERTIFICATE/ {
       file { '/etc/sensu/ssl/cert.pem':
-        ensure  => present,
+        ensure  => file,
         content => $sensu::rabbitmq_ssl_cert_chain,
         owner   => 'sensu',
         group   => 'sensu',
@@ -61,7 +61,7 @@ class sensu::rabbitmq::config {
     # URI provided
     if $sensu::rabbitmq_ssl_private_key and $sensu::rabbitmq_ssl_private_key =~ /^puppet:\/\// {
       file { '/etc/sensu/ssl/key.pem':
-        ensure  => present,
+        ensure  => file,
         source  => $sensu::rabbitmq_ssl_private_key,
         owner   => 'sensu',
         group   => 'sensu',
@@ -75,7 +75,7 @@ class sensu::rabbitmq::config {
     # create file with contents of the variable
     } elsif $sensu::rabbitmq_ssl_private_key and $sensu::rabbitmq_ssl_private_key =~ /BEGIN RSA PRIVATE KEY/ {
       file { '/etc/sensu/ssl/key.pem':
-        ensure  => present,
+        ensure  => file,
         content => $sensu::rabbitmq_ssl_private_key,
         owner   => 'sensu',
         group   => 'sensu',

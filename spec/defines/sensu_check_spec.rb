@@ -32,7 +32,8 @@ describe 'sensu::check', :type => :define do
         :timeout             => 0.5,
         :aggregate           => true,
         :handle              => true,
-        :publish             => true
+        :publish             => true,
+        :ttl                 => 30
       } }
 
       it { should contain_sensu_check('mycheck').with(
@@ -50,7 +51,8 @@ describe 'sensu::check', :type => :define do
         :timeout             => 0.5,
         :aggregate           => true,
         :handle              => true,
-        :publish             => true
+        :publish             => true,
+        :ttl                 => 30
       ) }
     end
 
@@ -135,5 +137,18 @@ describe 'sensu::check', :type => :define do
     end
   end
 
-end
+  context 'subdue' do
+    let(:title) { 'mycheck' }
+    let(:params) {
+      {
+        :command => '/etc/sensu/somecommand.rb',
+        :subdue  => {
+          'begin' => '5PM PST',
+          'end'   => '9AM PST'
+        }
+      }
+    }
 
+    it { should contain_sensu_check('mycheck').with_subdue( {'begin' => '5PM PST', 'end' => '9AM PST'}) }
+  end
+end

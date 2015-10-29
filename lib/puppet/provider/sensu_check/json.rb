@@ -30,7 +30,7 @@ Puppet::Type.type(:sensu_check).provide(:json) do
   end
 
   def check_args
-    ['handlers','command','interval','occurrences','refresh','subscribers','type','standalone','high_flap_threshold','low_flap_threshold','timeout','aggregate','handle','publish','dependencies','custom']
+    ['handlers','command','interval','occurrences','refresh','source','subscribers','type','standalone','high_flap_threshold','low_flap_threshold','timeout','aggregate','handle','publish','dependencies','custom','ttl']
   end
 
   def custom
@@ -103,7 +103,7 @@ Puppet::Type.type(:sensu_check).provide(:json) do
   end
 
   def subscribers
-    conf['checks'][resource[:name]]['subscribers']
+    conf['checks'][resource[:name]]['subscribers'] || []
   end
 
   def subscribers=(value)
@@ -132,6 +132,14 @@ Puppet::Type.type(:sensu_check).provide(:json) do
 
   def high_flap_threshold=(value)
     conf['checks'][resource[:name]]['high_flap_threshold'] = value.to_i
+  end
+
+  def source
+    conf['checks'][resource[:name]]['source']
+  end
+
+  def source=(value)
+    conf['checks'][resource[:name]]['source'] = value
   end
 
   def timeout
@@ -167,11 +175,6 @@ Puppet::Type.type(:sensu_check).provide(:json) do
   end
 
   def handle=(value)
-    if value && resource[:handlers]
-      Puppet.notice("Do not use 'handle' and 'handlers' together. Your 'handle' value has been overridden with 'handlers'")
-      return
-    end
-
     conf['checks'][resource[:name]]['handle'] = value
   end
 
@@ -189,5 +192,21 @@ Puppet::Type.type(:sensu_check).provide(:json) do
 
   def standalone=(value)
     conf['checks'][resource[:name]]['standalone'] = value
+  end
+
+  def ttl
+    conf['checks'][resource[:name]]['ttl'].to_s
+  end
+
+  def ttl=(value)
+    conf['checks'][resource[:name]]['ttl'] = value.to_i
+  end
+
+  def subdue
+    conf['checks'][resource[:name]]['subdue']
+  end
+
+  def subdue=(value)
+    conf['checks'][resource[:name]]['subdue'] = value
   end
 end

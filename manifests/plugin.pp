@@ -33,6 +33,11 @@
 #   Default: latest
 #   Valid values: absent, installed, latest, present, [\d\.\-]+
 #
+# [*pkg_provider*]
+#   String.  When using package to install plugins, provider to use.
+#   Default: undef
+#   Valid values: aptitude, apt, sensu_gem
+#
 # [*nocheckcertificate*]
 #   Boolean.  When using url source, disable certificate checking for HTTPS
 #   Default: false
@@ -44,8 +49,17 @@ define sensu::plugin(
   $recurse            = true,
   $force              = true,
   $pkg_version        = 'latest',
+  $pkg_provider       = $::sensu::sensu_plugin_provider,
   $nocheckcertificate = false,
 ){
+
+  File {
+    owner => 'sensu',
+    group => 'sensu',
+  }
+
+  Sensu::Plugin[$name] ->
+  Class['sensu::client::service']
 
   validate_bool($purge, $recurse, $force, $nocheckcertificate)
   validate_re($pkg_version, ['^absent$', '^installed$', '^latest$', '^present$', '^[\d\.\-]+$'], "Invalid package version: ${pkg_version}")
@@ -105,7 +119,8 @@ define sensu::plugin(
     }
     'package':    {
       package { $name:
-        ensure => $pkg_version
+        ensure   => $pkg_version,
+        provider => $pkg_provider,
       }
     }
     default:      {
