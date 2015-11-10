@@ -26,7 +26,6 @@ class sensu::client::config {
     client_name   => $sensu::client_name,
     address       => $sensu::client_address,
     bind          => $sensu::client_bind,
-    port          => $sensu::client_port,
     subscriptions => $sensu::subscriptions,
     safe_mode     => $sensu::safe_mode,
     custom        => $sensu::client_custom,
